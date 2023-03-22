@@ -11,6 +11,9 @@ import java.awt.event.KeyListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import java.awt.FontFormatException;
+import java.io.File;
+import java.io.IOException;
 
 
 
@@ -23,12 +26,21 @@ import javax.swing.Timer;
 	    private int ballSpeedX = 2, ballSpeedY = 2;
 	    private boolean[] keys = new boolean[256];
 	    private Score score = new Score();
+	    private Font scoreboardFont;
 
 	    public Pong() {
 	        timer = new Timer(1000 / 60, this);
 	        timer.start();
 	        addKeyListener(this);
 	        setFocusable(true);
+	        
+	        
+	        try {
+	        	scoreboardFont = Font.createFont(Font.TRUETYPE_FONT, new File("resources/PressStart2P-Regular.ttf")).deriveFont(36f);	
+	        } catch (FontFormatException | IOException e) {
+	        	e.printStackTrace();
+	        	scoreboardFont = new Font("Arial", Font.PLAIN, 36);
+	        }
 	    }
 
 	    public static void main(String[] args) {
@@ -55,7 +67,7 @@ import javax.swing.Timer;
 	        g.fillRect(WIDTH - 30, player2Y, 10, 100);
 
 	        g.fillOval(ballX, ballY, 20, 20);
-	        g.setFont(new Font("Arial", Font.PLAIN, 36));
+	        g.setFont(scoreboardFont);
 	        g.drawString(Integer.toString(score.getPlayer1Score()), WIDTH / 2 - 100, 50);
 	        g.drawString(Integer.toString(score.getPlayer2Score()), WIDTH / 2 + 70, 50);
 
