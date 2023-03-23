@@ -1,4 +1,4 @@
-package com.kishawi.pong;
+package com.kishawi.Pong;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,12 +8,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import java.awt.FontFormatException;
 import java.io.File;
 import java.io.IOException;
+
 
 
 
@@ -23,10 +26,12 @@ import java.io.IOException;
 	    private Timer timer;
 	    private int player1Y = HEIGHT / 2, player2Y = HEIGHT / 2;
 	    private int ballX = WIDTH / 2, ballY = HEIGHT / 2;
-	    private int ballSpeedX = 2, ballSpeedY = 2;
+	    private int ballSpeedX = 3, ballSpeedY = 3;
 	    private boolean[] keys = new boolean[256];
-	    private Score score = new Score();
+	    private boolean gamePaused = false;
 	    private Font scoreboardFont;
+	    private int player1Score = 0, player2Score = 0;
+	    
 
 	    public Pong() {
 	        timer = new Timer(1000 / 60, this);
@@ -54,6 +59,31 @@ import java.io.IOException;
 	        frame.setVisible(true);
 	    }
 
+	    private void checkGameStatus() {
+	        if (!gamePaused && (player1Score == 7 || player2Score == 7)) {
+	            gamePaused = true;
+	            SwingUtilities.invokeLater(new Runnable() {
+	                @Override
+	                public void run() {
+	                    showGameOptions();
+	                }
+	            });
+	        }
+	    }
+
+	    private void showGameOptions() {
+	    	String[] options = {"Restart", "Exit"};
+	    	int choice = JOptionPane.showOptionDialog(this, "Winner!", "Pong", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+	    	
+	    	if (choice == 0) {
+	    		player1Score = 0;
+	    		player2Score = 0;
+	    		gamePaused = false;
+	    	} else {
+	    		System.exit(0);
+	    	}
+	    }
+	    
 	    @Override
 	    public void paintComponent(Graphics g) {
 	        super.paintComponent(g);
@@ -68,14 +98,16 @@ import java.io.IOException;
 
 	        g.fillOval(ballX, ballY, 20, 20);
 	        g.setFont(scoreboardFont);
-	        g.drawString(Integer.toString(score.getPlayer1Score()), WIDTH / 2 - 100, 50);
-	        g.drawString(Integer.toString(score.getPlayer2Score()), WIDTH / 2 + 70, 50);
-
+	        g.drawString(Integer.toString(player1Score), WIDTH / 2 - 100, 50);
+	        g.drawString(Integer.toString(player2Score), WIDTH / 2 + 70, 50);
+	        
 	    }
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-	        ballX += ballSpeedX;
+	       if (!gamePaused) {
+	    	
+	    	ballX += ballSpeedX;
 	        ballY += ballSpeedY;
 
 	        if (ballX <= 30 && ballX >= 20 && ballY >= player1Y - 20 && ballY <= player1Y + 100) {
@@ -90,6 +122,8 @@ import java.io.IOException;
 	            ballSpeedY = -ballSpeedY;
 	            ballY += ballSpeedY;
 	        }
+	        
+	        
 	        
 	        int paddleSpeed = 3; 
 
@@ -109,24 +143,31 @@ import java.io.IOException;
 	        if (ballX <= 0) {
 	        	ballX = WIDTH / 2;
 	        	ballY = HEIGHT / 2;
-	        	ballSpeedX = 2;
-	        	ballSpeedY = 2;
-	        	score.incrementPlayer2Score();
+	        	ballSpeedX = 3;
+	        	ballSpeedY = 3;
+	            player2Score++;
+	        	checkGameStatus();
+	            
 	        	}
 	   
 	        if (ballX >= WIDTH) {
 	            ballX = WIDTH / 2;
 	            ballY = HEIGHT / 2;
-	            ballSpeedX = -2;
-	            ballSpeedY = 2;
-	            score.incrementPlayer1Score();
+	            ballSpeedX = -3;
+	            ballSpeedY = 3;
+	        	player1Score++;
+	            checkGameStatus();
+	            
 	        }
 
 	        player1Y = Math.max(0, Math.min(player1Y, HEIGHT - 100 - 30));
 	        player2Y = Math.max(0, Math.min(player2Y, HEIGHT - 100 - 30));
-
+	        
 	        repaint();
+	        
 	    }
+	    
+	}
 
 	    @Override
 	    public void keyPressed(KeyEvent e) {
@@ -149,6 +190,8 @@ import java.io.IOException;
 
 	    @Override
 	    public void keyTyped(KeyEvent e) {
+	    	
+	    	
 	    }
 	}
 

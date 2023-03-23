@@ -1,4 +1,4 @@
-package com.kishawi.pong;
+package com.kishawi.Pong;
 
 public class Score {
 	private int player1Score = 0;
